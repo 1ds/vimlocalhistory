@@ -19,14 +19,14 @@ class VimLocalHistory::Repository
 		initialize_log options[ :log]
 		initialize_location options[ :location]
 		initialize_exclusion_patterns(
-			options[ :exclude_paths], 
+			options[ :exclude_paths],
 			options[ :exclude_files]
 		)
 	end
 
 	def initialize_location( location=nil)
 		if location.is_a? String
-			path = File.expand_path( location) if 
+			path = File.expand_path( location) if
 				location and location.strip.size > 0
 			location = Proc.new { path }
 		end
@@ -34,7 +34,7 @@ class VimLocalHistory::Repository
 	end
 
 	def initialize_exclusion_patterns( exclude_paths, exclude_files)
-		exclude_paths_proc = 
+		exclude_paths_proc =
 			case exclude_paths
 			when String
 				Proc.new { exclude_paths }
@@ -96,7 +96,7 @@ class VimLocalHistory::Repository
 
 		ensure_repository_initialized
 		copy_file_to_repository( path)
-		git_add_and_commit_all
+		git_add_and_commit_all( "Modified #{path}")
 	end
 
 	def revision_information( path, options=[])
@@ -215,7 +215,7 @@ class VimLocalHistory::Repository
 		)
 		user_exclude_paths = @user_exclude_paths_proc.call
 		user_exclude_files = @user_exclude_files_proc.call
-		
+
 		file = path.chomps("#{File.dirname(path)}/")
 
 		path =~ @@implicit_exclusion_pattern or
@@ -302,7 +302,7 @@ class VimLocalHistory::Repository
 	end
 
 	def git_add_and_commit_all( msg="Commit from VimLocalHistory")
-		run [ 
+		run [
 			cmd_cd,
 			cmd_git_add_all,
 			cmd_git_commit_all( msg)
