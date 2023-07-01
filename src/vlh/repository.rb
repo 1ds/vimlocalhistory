@@ -211,7 +211,8 @@ class VimLocalHistory::Repository
 			/^.git\// |
 
 			/\/.git$/ |
-			/\/.git\//
+			/\/.git\// |
+			/\/worktrees\//
 		)
 		user_exclude_paths = @user_exclude_paths_proc.call
 		user_exclude_files = @user_exclude_files_proc.call
