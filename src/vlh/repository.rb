@@ -103,7 +103,7 @@ class VimLocalHistory::Repository
 		return [] unless path
 
 		path = repo_relative_path( path)
-		return [] unless File.exists?(
+		return [] unless File.exist?(
 			"#{location}/#{path}"
 		)
 
@@ -178,13 +178,13 @@ class VimLocalHistory::Repository
 
 	def initialized?
 		return false unless enabled?
-		File.exists? "#{location}/.git"
+		File.exist? "#{location}/.git"
 	end
 
 	def check_enabled
 		location do |loc|
 			loc and
-				File.exists?( loc) and
+				File.exist?( loc) and
 				File.new( loc).stat.writable?
 		end
 	end
@@ -319,7 +319,7 @@ class VimLocalHistory::Repository
 		return nil unless path
 
 		path = repo_relative_path( path)
-		return nil unless File.exists? "#{location}/#{path}"
+		return nil unless File.exist? "#{location}/#{path}"
 
 		revs = `cd #{location} && git rev-list HEAD #{path}`.split("\n")
 		yield path, revs

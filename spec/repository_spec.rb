@@ -14,12 +14,12 @@ describe VimLocalHistory::Repository do
 
 
 	before(:each) do
-		FileUtils.rm_r ['./test/without-repo', './test/with-repo'], 
+		FileUtils.rm_r ['./test/without-repo', './test/with-repo'],
 						:force => true
 		FileUtils.mkdir_p ['./test/without-repo', './test/with-repo']
-		
-		system 'cd test/with-repo && touch .gitignore && 
-				git-init > /dev/null && git add .gitignore && 
+
+		system 'cd test/with-repo && touch .gitignore &&
+				git-init > /dev/null && git add .gitignore &&
 				git commit --all -m "Initial Commit" > /dev/null'
 	end
 
@@ -112,7 +112,7 @@ describe VimLocalHistory::Repository do
 				should have_exactly(2).commits
 		end
 
-		it "should treat a path symlinked to some other path as separate 
+		it "should treat a path symlinked to some other path as separate
 		paths".compact! do
 			@repo.commit_file './spec/assets/sample_file.txt'
 			change_file './spec/assets/sample_file.txt'
@@ -135,7 +135,7 @@ describe VimLocalHistory::Repository do
 		it "should store absolute paths rooted at the repository location" do
 			FileUtils.cp './spec/assets/sample_file.txt', '/tmp/sample_file.txt'
 			@repo.commit_file '/tmp/sample_file.txt'
-			
+
 			git_revs( @repo.location, '/tmp/sample_file.txt').
 				should have_exactly(1).commits
 		end
@@ -145,8 +145,8 @@ describe VimLocalHistory::Repository do
 		realpath ./foo)".compact! do
 			@repo.commit_file './spec/assets/sample_file.txt'
 
-			git_revs( 
-				@repo.location, 
+			git_revs(
+				@repo.location,
 				File.expand_path('./spec/assets/sample_file.txt')
 			).should have_exactly(1).commits
 		end
@@ -154,7 +154,7 @@ describe VimLocalHistory::Repository do
 		it "should raise Errno::ENOENT if asked to commit non-existant
 		paths".compact! do
 			File.should_not be_exist('/tmp/fakepath')
-			lambda { 
+			lambda {
 				@repo.commit_file('/tmp/fakepath')
 			}.should raise_error(Errno::ENOENT)
 		end
@@ -181,7 +181,7 @@ describe VimLocalHistory::Repository do
 		scp'd file".compact! do
 			path = scp_path './spec/assets/sample_file.txt'
 
-			lambda{ 
+			lambda{
 				@repo.commit_file path
 			}.should raise_error( UnimplementedFeatureError)
 		end
@@ -240,17 +240,17 @@ describe VimLocalHistory::Repository do
 			it "should not silently ignore /foo.git/some_file" do
 				@repo.commit_file 'spec/assets/foo.git/sample_file.txt'
 
-				git_revs( 
-					@repo.location, 
+				git_revs(
+					@repo.location,
 					'./spec/assets/foo.git/sample_file.txt'
 				).should have_exactly(1).commits
 			end
-			
+
 			it "should not silently ignore /.gitfoo/some_file" do
 				@repo.commit_file 'spec/assets/.gitfoo/sample_file.txt'
 
-				git_revs( 
-					@repo.location, 
+				git_revs(
+					@repo.location,
 					'./spec/assets/.gitfoo/sample_file.txt'
 				).should have_exactly(1).commits
 			end
@@ -260,8 +260,8 @@ describe VimLocalHistory::Repository do
 
 				@repo.commit_file '.gitfoo/sample_file.txt'
 
-				git_revs( 
-					@repo.location, 
+				git_revs(
+					@repo.location,
 					'.gitfoo/sample_file.txt'
 				).should have_exactly(1).commits
 			end
@@ -273,8 +273,8 @@ describe VimLocalHistory::Repository do
 				@repo.commit_file 'spec/assets/foo/.gitignore'
 				@repo.commit_file 'spec/assets/foo/sample_file.txt'
 
-				git_revs( 
-					@repo.location, 
+				git_revs(
+					@repo.location,
 					'spec/assets/foo/sample_file.txt'
 				).should have_exactly(1).commits
 
@@ -321,7 +321,7 @@ describe VimLocalHistory::Repository do
 				path.should =~ regexp
 
 				@repo.commit_file  path
-				git_revs( 
+				git_revs(
 					@repo.location, path
 				).should have_exactly(1).commits
 			end
@@ -375,7 +375,7 @@ describe VimLocalHistory::Repository do
 
 
 		it "should initialize the git repository when first asked to commit a
-		file".compact! do 
+		file".compact! do
 			@repo.commit_file('./spec/assets/sample_file.txt')
 			File.should be_exist('./test/without-repo/.git')
 		end
@@ -403,7 +403,7 @@ describe VimLocalHistory::Repository do
 			begin
 				@repo.commit_file path
 			rescue => error
-				git_rev_head( @repo.location).should == starting_rev	
+				git_rev_head( @repo.location).should == starting_rev
 			end
 		end
 	end
@@ -485,12 +485,12 @@ describe VimLocalHistory::Repository do
 	describe "(logging)" do
 		it "should create the directory path if it does not already exist" do
 			FileUtils.rm_r './test/log', :force => true if
-				File.exists? './test/log'
+				File.exist? './test/log'
 			VimLocalHistory::Repository.new({
 				:location => './test/with-repo',
 				:log => './test/log',
 			})
-			
+
 			File.should be_exist( './test/log/vlh.log')
 		end
 	end
@@ -594,7 +594,7 @@ describe VimLocalHistory::Repository do
 
 				rv.should be_equal(true)
 				File.read('spec/assets/sample_file.txt').should == 'revision 1'
-				
+
 				git_revs( @repo.location, './spec/assets/sample_file.txt').
 					should have_exactly(5).commits
 			end
@@ -662,11 +662,11 @@ describe VimLocalHistory::Repository do
 			it "should consider each option a format placeholder for git
 			rev-list, and return the information as a hash, along with the
 			implied key :commit".compact! do
-				rev_info = @repo.revision_information( 
-					'spec/assets/sample_file.txt', 
+				rev_info = @repo.revision_information(
+					'spec/assets/sample_file.txt',
 					%w(s)
 				)
-			
+
 				rev_info.size.should == 4
 
 				rev_info.each do |entry|
@@ -675,7 +675,7 @@ describe VimLocalHistory::Repository do
 					entry[:s].should == 'Commit from VimLocalHistory'
 				end
 			end
-			
+
 			it "should return an empty array for nil paths" do
 				@repo.revision_information(nil, %w(s)).should == []
 			end
